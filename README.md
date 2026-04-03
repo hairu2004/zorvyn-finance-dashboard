@@ -252,4 +252,4 @@ The application is production-ready and showcases the skills expected of a front
 
 ---
 
-**Built with ❤️ for Zorvyn Interview Process**
+
