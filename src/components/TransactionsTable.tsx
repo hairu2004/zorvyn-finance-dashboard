@@ -59,17 +59,23 @@ export function TransactionsTable({ transactions, role, onEdit, onAdd, onDelete 
     description: '',
     category: '',
     type: 'expense',
-    amount: 0,
+    amount: '',
   });
 
   const startEdit = (tx: Transaction) => {
     setEditId(tx.id);
-    setForm({ date: tx.date, description: tx.description, category: tx.category, type: tx.type, amount: tx.amount });
+    setForm({
+      date: tx.date,
+      description: tx.description.replace(/\b\w/g, l => l.toUpperCase()),
+      category: tx.category.replace(/\b\w/g, l => l.toUpperCase()),
+      type: tx.type,
+      amount: tx.amount.toString()
+    });
   };
 
   const resetForm = () => {
     setEditId('');
-    setForm({ date: '', description: '', category: '', type: 'expense', amount: 0 });
+    setForm({ date: '', description: '', category: '', type: 'expense', amount: '' });
   };
 
   return (
@@ -100,12 +106,14 @@ export function TransactionsTable({ transactions, role, onEdit, onAdd, onDelete 
             type="date"
             value={dateFrom}
             onChange={(e) => setDateFrom(e.target.value)}
+            placeholder="From date"
           />
           <input
             className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
             type="date"
             value={dateTo}
             onChange={(e) => setDateTo(e.target.value)}
+            placeholder="To date"
           />
           <select
             className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
@@ -162,14 +170,14 @@ export function TransactionsTable({ transactions, role, onEdit, onAdd, onDelete 
               {paginated.map((tx) => (
                 <tr key={tx.id} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                   <td className="py-4 px-4 text-slate-900 dark:text-slate-100 font-medium">{tx.date}</td>
-                  <td className="py-4 px-4 text-slate-900 dark:text-slate-100">{tx.description}</td>
+                  <td className="py-4 px-4 text-slate-900 dark:text-slate-100 capitalize">{tx.description}</td>
                   <td className="py-4 px-4">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 capitalize">
                       {tx.category}
                     </span>
                   </td>
                   <td className="py-4 px-4">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${
                       tx.type === 'income'
                         ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200'
                         : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200'
@@ -264,6 +272,7 @@ export function TransactionsTable({ transactions, role, onEdit, onAdd, onDelete 
                 type="date"
                 value={form.date}
                 onChange={(e) => setForm((v) => ({ ...v, date: e.target.value }))}
+                placeholder="Select date"
               />
             </div>
             <div className="space-y-2">
@@ -273,8 +282,8 @@ export function TransactionsTable({ transactions, role, onEdit, onAdd, onDelete 
               <input
                 className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
                 value={form.description}
-                onChange={(e) => setForm((v) => ({ ...v, description: e.target.value }))}
-                placeholder="Enter description"
+                onChange={(e) => setForm((v) => ({ ...v, description: e.target.value.replace(/\b\w/g, l => l.toUpperCase()) }))}
+                placeholder="Enter transaction description"
               />
             </div>
             <div className="space-y-2">
@@ -284,7 +293,7 @@ export function TransactionsTable({ transactions, role, onEdit, onAdd, onDelete 
               <input
                 className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
                 value={form.category}
-                onChange={(e) => setForm((v) => ({ ...v, category: e.target.value }))}
+                onChange={(e) => setForm((v) => ({ ...v, category: e.target.value.replace(/\b\w/g, l => l.toUpperCase()) }))}
                 placeholder="Enter category"
               />
             </div>
@@ -309,7 +318,7 @@ export function TransactionsTable({ transactions, role, onEdit, onAdd, onDelete 
                 className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
                 type="number"
                 value={form.amount}
-                onChange={(e) => setForm((v) => ({ ...v, amount: Number(e.target.value) }))}
+                onChange={(e) => setForm((v) => ({ ...v, amount: e.target.value }))}
                 placeholder="0.00"
                 step="0.01"
                 min="0"
@@ -320,14 +329,14 @@ export function TransactionsTable({ transactions, role, onEdit, onAdd, onDelete 
             <button
               className="inline-flex items-center px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-colors focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
               onClick={() => {
-                if (!form.date || !form.description || !form.category || form.amount === 0) {
+                if (!form.date || !form.description || !form.category || !form.amount || Number(form.amount) <= 0) {
                   alert('Please fill in all fields with valid values');
                   return;
                 }
                 if (editId) {
-                  onEdit(editId, form);
+                  onEdit(editId, { ...form, amount: Number(form.amount) });
                 } else {
-                  onAdd(form);
+                  onAdd({ ...form, amount: Number(form.amount) });
                 }
                 resetForm();
               }}
